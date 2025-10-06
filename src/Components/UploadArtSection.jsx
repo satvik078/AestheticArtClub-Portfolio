@@ -13,7 +13,7 @@ const UploadArtSection = () => {
 
     setUploading(true);
     try {
-      const res = await axios.post("https://aestheticartclub-portfolio.onrender.com", formData, {
+      const res = await axios.post("https://aestheticartclub-portfolio.onrender.com/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setImages((prev) => [res.data.url, ...prev]);
