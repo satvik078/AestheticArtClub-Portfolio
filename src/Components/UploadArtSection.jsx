@@ -13,7 +13,7 @@ const UploadArtSection = () => {
 
     setUploading(true);
     try {
-      const res = await axios.post("https://aestheticartclub-portfolio.onrender.com", formData, {
+      const res = await axios.post("https://aestheticartclub-portfolio-1.onrender.com", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setImages((prev) => [res.data.url, ...prev]);
@@ -28,7 +28,7 @@ const UploadArtSection = () => {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
   useEffect(() => {
-    axios.get("http://localhost:5000/images").then((res) => setImages(res.data));
+    axios.get("https://aestheticartclub-portfolio-1.onrender.com/images").then((res) => setImages(res.data));
   }, []);
 
   return (
