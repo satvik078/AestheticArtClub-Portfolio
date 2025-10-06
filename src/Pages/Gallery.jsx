@@ -1,11 +1,33 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { ART_DATA } from '../data/artData';
-import ArtCard from '../Components/ArtCard';
-import AestheticButton from '../Components/AestheticButton';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import ArtCard from "../Components/ArtCard";
+import AestheticButton from "../Components/AestheticButton";
+import axios from "axios";
 
 const Gallery = () => {
-  const { artworks } = ART_DATA;
+  const [artworks, setArtworks] = useState([]);
+
+  // Fetch all images from backend
+  const fetchGallery = async () => {
+    try {
+      const res = await axios.get("https://aestheticartclub-portfolio.onrender.com/images");
+
+      // Map URLs to artwork objects expected by ArtCard
+      const artObjects = res.data.map((url, idx) => ({
+        id: idx,
+        title: "Uploaded Art",
+        url, // Make sure ArtCard uses artwork.url
+      }));
+
+      setArtworks(artObjects);
+    } catch (err) {
+      console.error("Failed to fetch gallery images", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchGallery();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-16 px-6 transition-all duration-500">
