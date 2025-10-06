@@ -56,15 +56,21 @@ app.get("/images", async (req, res) => {
 });
 
 // ------------------- DELETE IMAGE ROUTE -------------------
-app.delete("/images/:public_id", async (req, res) => {
-  const { public_id } = req.params;
-  if (!public_id) return res.status(400).json({ error: "No public_id provided" });
+app.delete("/delete", async (req, res) => {
+  const { url } = req.body;
+  if (!url) return res.status(400).json({ error: "No URL provided" });
 
   try {
-    await cloudinary.uploader.destroy(public_id);
+    // Extract public_id from the URL
+    // Cloudinary URL format: https://res.cloudinary.com/<cloud_name>/.../<public_id>.<ext>
+    const segments = url.split("/");
+    const fileWithExt = segments[segments.length - 1]; // last part with extension
+    const public_id = fileWithExt.substring(0, fileWithExt.lastIndexOf(".")); // remove extension
+
+    await cloudinary.uploader.destroy(`aesthetic-artclub/${public_id}`); // delete from folder
     res.json({ message: "Image deleted successfully" });
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Failed to delete image" });
   }
 });
@@ -72,6 +78,7 @@ app.delete("/images/:public_id", async (req, res) => {
 // ------------------- SERVE FRONTEND -------------------
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
 const frontendBuildPath = path.join(__dirname, "../dist");
 
 app.use(express.static(frontendBuildPath));

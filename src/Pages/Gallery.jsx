@@ -1,36 +1,46 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import ArtCard from "../Components/ArtCard";
 import AestheticButton from "../Components/AestheticButton";
 import axios from "axios";
-import { Link } from "react-router-dom";
+
+const isOwner = true; // Set to true for owner view, false for visitors
 
 const Gallery = () => {
   const [artworks, setArtworks] = useState([]);
 
   // Fetch all images from backend
-  const fetchImages = async () => {
+  const fetchGallery = async () => {
     try {
       const res = await axios.get("https://aestheticartclub-portfolio.onrender.com/images");
-      setArtworks(res.data);
+
+      // Map URLs to artwork objects expected by ArtCard
+      const artObjects = res.data.map((url, idx) => ({
+        id: idx,
+        title: "Uploaded Art",
+        imageUrl: url,
+      }));
+
+      setArtworks(artObjects);
     } catch (err) {
-      console.error(err);
+      console.error("Failed to fetch gallery images", err);
     }
   };
 
   useEffect(() => {
-    fetchImages();
+    fetchGallery();
   }, []);
 
-  // Delete image
-  const handleDelete = async (public_id) => {
-    if (!window.confirm("Are you sure you want to delete this image?")) return;
-
+  // Remove image from backend and state
+  const handleRemove = async (artId, imageUrl) => {
     try {
-      await axios.delete(`https://aestheticartclub-portfolio.onrender.com/images/${public_id}`);
-      setArtworks((prev) => prev.filter((img) => img.public_id !== public_id));
+      // Call backend to remove image from cloudinary
+      await axios.delete("https://aestheticartclub-portfolio.onrender.com/delete", { data: { url: imageUrl } });
+
+      // Remove from state
+      setArtworks((prev) => prev.filter((art) => art.id !== artId));
     } catch (err) {
-      console.error(err);
-      alert("Failed to delete image.");
+      console.error("Failed to delete image", err);
     }
   };
 
@@ -47,14 +57,16 @@ const Gallery = () => {
         {/* Gallery Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
           {artworks.map((art) => (
-            <div key={art.public_id} className="relative">
-              <ArtCard artwork={{ imageUrl: art.url, title: "Artwork" }} />
-              <button
-                onClick={() => handleDelete(art.public_id)}
-                className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-sm"
-              >
-                Remove
-              </button>
+            <div key={art.id} className="relative">
+              <ArtCard artwork={art} />
+              {isOwner && (
+                <button
+                  onClick={() => handleRemove(art.id, art.imageUrl)}
+                  className="absolute top-2 right-2 bg-red-600 text-white px-2 py-1 rounded text-xs hover:bg-red-700 transition"
+                >
+                  Remove
+                </button>
+              )}
             </div>
           ))}
         </div>
