@@ -22,10 +22,9 @@ const UploadArtSection = () => {
     fetchImages();
   }, []);
 
-  // Upload file handler
+  // Handle file drop / upload
   const onDrop = useCallback(async (acceptedFiles) => {
-    if (!acceptedFiles || acceptedFiles.length === 0) return;
-
+    if (!acceptedFiles.length) return;
     const file = acceptedFiles[0];
     const formData = new FormData();
     formData.append("file", file);
@@ -39,9 +38,7 @@ const UploadArtSection = () => {
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
-
-      // Add the newly uploaded image at the top
-      setImages((prev) => [res.data.url, ...prev]);
+      setImages((prev) => [res.data, ...prev]);
     } catch (err) {
       console.error(err);
       setError("Upload failed. Please try again.");
@@ -49,6 +46,19 @@ const UploadArtSection = () => {
       setUploading(false);
     }
   }, []);
+
+  // Delete image
+  const handleDelete = async (public_id) => {
+    if (!window.confirm("Are you sure you want to delete this image?")) return;
+
+    try {
+      await axios.delete(`https://aestheticartclub-portfolio.onrender.com/images/${public_id}`);
+      setImages((prev) => prev.filter((img) => img.public_id !== public_id));
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete image.");
+    }
+  };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
@@ -62,20 +72,23 @@ const UploadArtSection = () => {
         }`}
       >
         <input {...getInputProps()} />
-        {uploading ? (
-          <p className="text-blue-600 font-medium">Uploading...</p>
-        ) : (
-          <p>Drag & drop your art here, or click to upload</p>
-        )}
+        {uploading ? <p className="text-blue-600 font-medium">Uploading...</p> : <p>Drag & drop your art here, or click to upload</p>}
       </div>
 
-      {/* Error Message */}
       {error && <p className="text-red-600 mt-4">{error}</p>}
 
-      {/* Image Gallery */}
+      {/* Gallery */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-10">
-        {images.map((url, idx) => (
-          <img key={idx} src={url} alt={`Art ${idx}`} className="rounded-xl shadow-md" />
+        {images.map((img) => (
+          <div key={img.public_id} className="relative">
+            <img src={img.url} alt="Uploaded Art" className="rounded-xl shadow-md" />
+            <button
+              onClick={() => handleDelete(img.public_id)}
+              className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-sm"
+            >
+              Remove
+            </button>
+          </div>
         ))}
       </div>
     </div>

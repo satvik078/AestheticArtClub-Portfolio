@@ -1,19 +1,44 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import { ART_DATA } from "./data/artData";
+import axios from "axios";
+
 import AestheticButton from "./Components/AestheticButton";
 import ArtCard from "./Components/ArtCard";
 import TestimonialsSection from "./Components/TestimonialsSection";
 import SocialFeedSection from "./Components/SocialFeedSection";
 import Footer from "./Components/Footer";
-import { useFeaturedPrints } from "./hooks/useFeaturedPrints";
 import ThemeToggle from "./Components/ThemeToggle";
+
 import Gallery from "./Pages/Gallery";
 import UploadArtSection from "./Components/UploadArtSection";
 
 const Home = () => {
-  const { artworks, testimonials, socialFeed } = ART_DATA;
-  const featuredPrints = useFeaturedPrints(artworks);
+  const [featuredArt, setFeaturedArt] = useState([]);
+  const [testimonials, setTestimonials] = useState([]);
+  const [socialFeed, setSocialFeed] = useState([]);
+
+  useEffect(() => {
+    // Fetch latest images from backend for Featured section
+    axios
+      .get("https://aestheticartclub-portfolio.onrender.com/images")
+      .then((res) => {
+        setFeaturedArt(res.data.slice(0, 6)); // Latest 6 images as featured
+      })
+      .catch((err) => console.error(err));
+
+    // Optionally, fetch static testimonials and social feed
+    // Can replace with backend API if dynamic
+    setTestimonials([
+      { id: 1, quote: "Jane’s attention to detail is unmatched.", source: "Client A. (Commission)", type: "client" },
+      { id: 2, quote: "A must-see portfolio.", source: "Art Daily Magazine", type: "press", link: "#" },
+      { id: 3, quote: "Incredible quality for the price.", source: "Etsy Purchaser", type: "client" },
+    ]);
+
+    setSocialFeed([
+      { id: 101, type: "post", caption: "New sketch for my upcoming series.", image: "", platform: "Instagram", link: "#" },
+      { id: 102, type: "video", caption: "Time-lapse of cityscape painting.", image: "", platform: "Youtube", link: "#" },
+    ]);
+  }, []);
 
   return (
     <div className="min-h-screen w-full bg-gray-50 dark:bg-gray-900 flex-col items-center font-sans overflow-x-hidden transition-all duration-500">
@@ -44,24 +69,24 @@ const Home = () => {
 
       {/* Main Content */}
       <main className="w-full max-w-8xl px-6 md:px-12 py-16 mx-auto transition-colors duration-500">
-        {/* Featured Section */}
+        {/* Featured Art Section */}
         <section id="gallery" className="mb-16 text-center">
           <h2 className="text-3xl font-serif text-gray-700 dark:text-gray-200 mb-8 tracking-wider">
             Featured Artworks
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            {artworks.slice(0, 6).map((art) => (
-              <ArtCard key={art.id} artwork={art} />
+            {featuredArt.map((art) => (
+              <ArtCard key={art.public_id} artwork={{ imageUrl: art.url, title: "Artwork" }} />
             ))}
           </div>
         </section>
 
-        {/* Testimonials */}
+        {/* Testimonials Section */}
         <section className="mb-16 pt-8 border-t border-gray-200 dark:border-gray-700">
           <TestimonialsSection testimonials={testimonials} />
         </section>
 
-        {/* Social Feeds */}
+        {/* Social Feed Section */}
         <section className="mb-16 pt-8 border-t border-gray-200 dark:border-gray-700">
           <SocialFeedSection feedItems={socialFeed} />
         </section>

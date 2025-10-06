@@ -1,33 +1,38 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import ArtCard from "../Components/ArtCard";
 import AestheticButton from "../Components/AestheticButton";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 const Gallery = () => {
   const [artworks, setArtworks] = useState([]);
 
   // Fetch all images from backend
-  const fetchGallery = async () => {
+  const fetchImages = async () => {
     try {
       const res = await axios.get("https://aestheticartclub-portfolio.onrender.com/images");
-
-      // Map URLs to artwork objects expected by ArtCard
-      const artObjects = res.data.map((url, idx) => ({
-        id: idx,
-        title: "Uploaded Art",
-        url, // Make sure ArtCard uses artwork.url
-      }));
-
-      setArtworks(artObjects);
+      setArtworks(res.data);
     } catch (err) {
-      console.error("Failed to fetch gallery images", err);
+      console.error(err);
     }
   };
 
   useEffect(() => {
-    fetchGallery();
+    fetchImages();
   }, []);
+
+  // Delete image
+  const handleDelete = async (public_id) => {
+    if (!window.confirm("Are you sure you want to delete this image?")) return;
+
+    try {
+      await axios.delete(`https://aestheticartclub-portfolio.onrender.com/images/${public_id}`);
+      setArtworks((prev) => prev.filter((img) => img.public_id !== public_id));
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete image.");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-16 px-6 transition-all duration-500">
@@ -42,7 +47,15 @@ const Gallery = () => {
         {/* Gallery Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
           {artworks.map((art) => (
-            <ArtCard key={art.id} artwork={art} />
+            <div key={art.public_id} className="relative">
+              <ArtCard artwork={{ imageUrl: art.url, title: "Artwork" }} />
+              <button
+                onClick={() => handleDelete(art.public_id)}
+                className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-sm"
+              >
+                Remove
+              </button>
+            </div>
           ))}
         </div>
 

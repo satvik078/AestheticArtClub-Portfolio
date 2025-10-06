@@ -30,7 +30,7 @@ app.post("/upload", upload.single("file"), async (req, res) => {
       folder: "aesthetic-artclub",
     });
     fs.unlinkSync(req.file.path); // remove local temp file
-    res.json({ url: result.secure_url });
+    res.json({ url: result.secure_url, public_id: result.public_id });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Upload failed" });
@@ -45,24 +45,37 @@ app.get("/images", async (req, res) => {
       .sort_by("public_id", "desc")
       .max_results(50)
       .execute();
-    const urls = resources.map((file) => file.secure_url);
+    const urls = resources.map((file) => ({
+      url: file.secure_url,
+      public_id: file.public_id,
+    }));
     res.json(urls);
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch images" });
   }
 });
 
+// ------------------- DELETE IMAGE ROUTE -------------------
+app.delete("/images/:public_id", async (req, res) => {
+  const { public_id } = req.params;
+  if (!public_id) return res.status(400).json({ error: "No public_id provided" });
+
+  try {
+    await cloudinary.uploader.destroy(public_id);
+    res.json({ message: "Image deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to delete image" });
+  }
+});
+
 // ------------------- SERVE FRONTEND -------------------
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-// Adjust this path if your dist folder is in the root
 const frontendBuildPath = path.join(__dirname, "../dist");
 
-// Serve static files from Vite build
 app.use(express.static(frontendBuildPath));
 
-// For all other routes, serve index.html (React Router support)
 app.get("*", (req, res) => {
   res.sendFile(path.join(frontendBuildPath, "index.html"));
 });
