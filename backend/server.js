@@ -4,8 +4,13 @@ import dotenv from "dotenv";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import connectDB from "./config/db.js";
+import artRoutes from "./routes/artRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 
 dotenv.config();
+connectDB();
 
 const app = express();
 const PORT = process.env.PORT || 10000;
@@ -13,6 +18,11 @@ const PORT = process.env.PORT || 10000;
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+
+app.use("/gallery", artRoutes);
+app.use("/auth", authRoutes);
+app.use("/admin", adminRoutes);
 app.use("/uploads", express.static("uploads"));
 
 // Ensure uploads folder exists
@@ -62,3 +72,4 @@ app.get("/", (req, res) => {
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
 });
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

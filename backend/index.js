@@ -6,12 +6,19 @@ import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import artRoutes from "./routes/artRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
+
 
 dotenv.config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use("/uploads", express.static("uploads"));
+
+app.use("/api/art", artRoutes);
+app.use("/api/admin", adminRoutes);
 
 // ------------------- CLOUDINARY CONFIG -------------------
 cloudinary.config({
@@ -21,7 +28,7 @@ cloudinary.config({
 });
 
 // ------------------- MULTER SETUP -------------------
-const upload = multer({ dest: "uploads/" });
+const upload = multer({ dest: "uploads/"});
 
 // ------------------- UPLOAD ROUTE -------------------
 app.post("/upload", upload.single("file"), async (req, res) => {

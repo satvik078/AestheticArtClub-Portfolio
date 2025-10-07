@@ -10,6 +10,9 @@ import { useFeaturedPrints } from "./hooks/useFeaturedPrints";
 import ThemeToggle from "./Components/ThemeToggle";
 import Gallery from "./Pages/Gallery";
 import UploadArtSection from "./Components/UploadArtSection";
+import Navbar from "./Components/Navbar";
+import AdminLogin from "./Pages/AdminLogin";
+import AdminDashboard from "./Pages/AdminDashboard";
 
 const Home = () => {
   const { artworks, testimonials, socialFeed } = ART_DATA;
@@ -72,6 +75,12 @@ const Home = () => {
   );
 };
 
+// Protected Route for Admin Dashboard
+const ProtectedRoute = ({ element }) => {
+  const token = localStorage.getItem("adminToken");
+  return token ? element : <Navigate to="/admin" replace />;
+};
+
 const App = () => {
   const [theme, setTheme] = useState(localStorage.theme || "light");
 
@@ -91,6 +100,8 @@ const App = () => {
   return (
     <Router>
       <div className="relative min-h-screen transition-colors duration-500">
+        {/* Navbar */}
+        <Navbar />
         {/* Floating Theme Toggle */}
         <div className="fixed bottom-6 right-6 z-50">
           <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
@@ -101,6 +112,11 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/upload" element={<UploadArtSection />} />
+          <Route path="/admin" element={<AdminLogin />} />
+          <Route
+            path="/admin/dashboard"
+            element={<ProtectedRoute element={<AdminDashboard />} />}
+          />
         </Routes>
       </div>
     </Router>
