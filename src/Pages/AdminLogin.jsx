@@ -23,7 +23,7 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
+    <div className="flex flex-col items-center justify-center h-screen bg-black-100">
       <h2 className="text-2xl font-bold mb-4">Admin Login</h2>
       <form className="bg-white p-6 rounded shadow-md" onSubmit={handleLogin}>
         <input
