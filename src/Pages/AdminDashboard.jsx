@@ -8,7 +8,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const res = await axios.get("https://aesthetic-art-backend.onrender.com/gallery");
+      const res = await axios.get("https://aestheticartclub-portfolio.onrender.com/gallery");
       setArtList(res.data);
     };
     fetchData();
@@ -16,7 +16,7 @@ const AdminDashboard = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`https://aesthetic-art-backend.onrender.com/admin/delete/${id}`, {
+      await axios.delete(`https://aestheticartclub-portfolio.onrender.com/admin/delete/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setArtList(artList.filter((item) => item._id !== id));
