@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import { ART_DATA } from "./data/artData";
+import { ART_DATA } from "./Data/artData";
 import AestheticButton from "./Components/AestheticButton";
 import ArtCard from "./Components/ArtCard";
 import TestimonialsSection from "./Components/TestimonialsSection";
