@@ -2,7 +2,7 @@ import React, { useCallback, useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import axios from "axios";
 
-const BACKEND_URL = "https://aestheticartclub-portfolio.onrender.com";
+const BACKEND_URL = "https://aestheticartclub-backend.onrender.com";
 
 const UploadArtSection = () => {
   const [images, setImages] = useState([]);

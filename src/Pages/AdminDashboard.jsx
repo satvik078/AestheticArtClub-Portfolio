@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-const BACKEND_URL = "https://aestheticartclub-portfolio.onrender.com";  // Adjust if URL changes in Render
+const BACKEND_URL = "https://aestheticartclub-backend.onrender.com";  // Adjust if URL changes in Render
 const token = localStorage.getItem("adminToken"); // For future authentication (optional enhancement)
 
 const AdminDashboard = () => {
