@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ART_DATA } from '../data/artData';
+import { ART_DATA } from '../Data/artData';
 import ArtCard from '../Components/ArtCard';
 import AestheticButton from '../Components/AestheticButton';
 
