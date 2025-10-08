@@ -11,7 +11,7 @@ const AdminLogin = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("https://aestheticartclub-portfolio.onrender.com/api/auth/login", {
+      const res = await axios.post("https://aestheticartclub-portfolio.onrender.com/auth/login", {
         email,
         password,
       });
